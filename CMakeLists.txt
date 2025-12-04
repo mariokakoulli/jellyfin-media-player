@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.5.0 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.10...3.31 FATAL_ERROR)
 
 # use a toolchain file if any for Embedded
 if (EXISTS "${CMAKE_SOURCE_DIR}/toolchain.cmake")
@@ -10,8 +10,14 @@ project(JellyfinMediaPlayer CXX C)
 # we want this to be able to run clang-tidy
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON CACHE BOOL "" FORCE)
 
+option(CHECK_FOR_UPDATES "Enable checking for new versions of Jellyfin Media Player" ON)
 option(OPENELEC "Make an OpenELEC build" OFF)
 option(LINUX_X11POWER "Enable non D-Bus screensaver management" OFF)
+option(USE_STATIC_MPVQT "Build MpvQt from bundled submodule instead of using system library" ON)
+
+if (NOT CHECK_FOR_UPDATES)
+    add_definitions(-DDISABLE_UPDATE_CHECK)
+endif()
 
 if((NOT LINUX_X11POWER) AND (UNIX AND (NOT APPLE)))
   set(LINUX_DBUS ON)
@@ -41,7 +47,6 @@ endmacro()
 set_policy(CMP0020 NEW)
 set_policy(CMP0017 NEW)
 set_policy(CMP0058 NEW)
-set_policy(CMP0026 OLD)
 set_policy(CMP0071 NEW)
 set_policy(CMP0072 NEW)
 set_policy(CMP0148 OLD)
@@ -66,12 +71,15 @@ elseif(UNIX AND (NOT APPLE))
   include(LinuxConfiguration)
 endif(APPLE)
 
-if (Qt5_POSITION_INDEPENDENT_CODE)
+if (Qt6_POSITION_INDEPENDENT_CODE)
   SET(CMAKE_POSITION_INDEPENDENT_CODE ON)
-endif(Qt5_POSITION_INDEPENDENT_CODE)
+endif(Qt6_POSITION_INDEPENDENT_CODE)
 
 add_subdirectory(external)
 add_subdirectory(src)
+
+enable_testing()
+add_subdirectory(tests)
 
 include(CPackConfiguration)
 

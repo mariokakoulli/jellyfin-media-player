@@ -11,16 +11,18 @@ jobs:
     runs-on: macos-13
     steps:
     - uses: actions/checkout@v4
+      with:
+        submodules: recursive
     - name: Install dependencies
       run: |
         brew update
-        brew install ninja mpv qt@5 || true
+        brew install ninja mpv qt@6 || true
     - name: Release build
       run: |
         mkdir build
         sed -i '' 's|await loadScript('\''qrc:///qtwebchannel/qwebchannel.js'\'');|document.body.style.overscrollBehavior = "none";&|g' native/nativeshell.js
         cd build
-        cmake -GNinja -DQTROOT=/usr/local/opt/qt@5 -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=output ..
+        cmake -GNinja -DQTROOT=/usr/local/opt/qt@6 -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=output ..
         ninja install
     - name: Fix library paths and create dmg
       run: |
@@ -50,16 +52,18 @@ jobs:
     runs-on: macos-14
     steps:
     - uses: actions/checkout@v4
+      with:
+        submodules: recursive
     - name: Install dependencies
       run: |
         brew update
-        brew install ninja mpv qt@5 || true
+        brew install ninja mpv qt@6 || true
     - name: Release build
       run: |
         mkdir build
         sed -i '' 's|await loadScript('\''qrc:///qtwebchannel/qwebchannel.js'\'');|document.body.style.overscrollBehavior = "none";&|g' native/nativeshell.js
         cd build
-        cmake -GNinja -DQTROOT=/opt/homebrew/opt/qt@5 -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=output ..
+        cmake -GNinja -DQTROOT=/opt/homebrew/opt/qt@6 -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=output ..
         ninja install
     - name: Fix library paths and create dmg
       run: |
@@ -78,10 +82,12 @@ jobs:
     runs-on: windows-latest
     steps:
     - uses: actions/checkout@v4
-    - name: Install Qt 5.15.2
+      with:
+        submodules: recursive
+    - name: Install Qt 6
       uses: jurplel/install-qt-action@v3
       with:
-        version: "5.15.2"
+        version: "6.8.0"
         arch: "win64_msvc2019_64"
         modules: "qtwebengine"
     - name: Install dependencies
@@ -107,7 +113,7 @@ jobs:
         call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
         cd build
         set PATH=%PATH%;C:\Program Files (x86)\WiX Toolset v3.11\bin;%CD%
-        cmake -GNinja -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_INSTALL_PREFIX=output -DCMAKE_MAKE_PROGRAM=ninja.exe -DQTROOT=%Qt5_DIR% -DMPV_INCLUDE_DIR=mpv/include -DMPV_LIBRARY=mpv/libmpv-2.dll -DCMAKE_INSTALL_PREFIX=output ..
+        cmake -GNinja -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_INSTALL_PREFIX=output -DCMAKE_MAKE_PROGRAM=ninja.exe -DQTROOT=%Qt6_DIR% -DMPV_INCLUDE_DIR=mpv/include -DMPV_LIBRARY=mpv/libmpv-2.dll ..
         lib /def:mpv\mpv.def /out:mpv\libmpv-2.dll.lib /MACHINE:X64
         ninja
         ninja windows_package
@@ -122,10 +128,12 @@ jobs:
     runs-on: windows-latest
     steps:
     - uses: actions/checkout@v4
-    - name: Install Qt 5.15.2
-      uses: jurplel/install-qt-action@v3
       with:
-        version: "5.15.2"
+        submodules: recursive
+    - name: Install Qt 6
+      uses: jurplel/install-qt-action@v4
+      with:
+        version: "6.8.0"
         arch: "win64_msvc2019_64"
         modules: "qtwebengine"
     - name: Install dependencies
@@ -151,7 +159,7 @@ jobs:
         call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
         cd build
         set PATH=%PATH%;C:\Program Files (x86)\WiX Toolset v3.11\bin;%CD%
-        cmake -GNinja -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_INSTALL_PREFIX=output -DCMAKE_MAKE_PROGRAM=ninja.exe -DQTROOT=%Qt5_DIR% -DMPV_INCLUDE_DIR=mpv/include -DMPV_LIBRARY=mpv/libmpv-2.dll -DCMAKE_INSTALL_PREFIX=output ..
+        cmake -GNinja -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_INSTALL_PREFIX=output -DCMAKE_MAKE_PROGRAM=ninja.exe -DQTROOT=%Qt6_DIR% -DMPV_INCLUDE_DIR=mpv/include -DMPV_LIBRARY=mpv/libmpv-2.dll ..
         lib /def:mpv\mpv.def /out:mpv\libmpv-2.dll.lib /MACHINE:X64
         ninja
         ninja windows_package
@@ -166,10 +174,12 @@ jobs:
     runs-on: windows-latest
     steps:
     - uses: actions/checkout@v4
-    - name: Install Qt 5.15.2
-      uses: jurplel/install-qt-action@v3
       with:
-        version: "5.15.2"
+        submodules: recursive
+    - name: Install Qt 6
+      uses: jurplel/install-qt-action@v4
+      with:
+        version: "6.8.0"
         arch: "win32_msvc2019"
         modules: "qtwebengine"
     - name: Install dependencies
@@ -195,7 +205,7 @@ jobs:
         call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars32.bat"
         cd build
         set PATH=%PATH%;C:\Program Files (x86)\WiX Toolset v3.11\bin;%CD%
-        cmake -GNinja -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_INSTALL_PREFIX=output -DCMAKE_MAKE_PROGRAM=ninja.exe -DQTROOT=%Qt5_DIR% -DMPV_INCLUDE_DIR=mpv/include -DMPV_LIBRARY=mpv/libmpv-2.dll -DCMAKE_INSTALL_PREFIX=output ..
+        cmake -GNinja -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_INSTALL_PREFIX=output -DCMAKE_MAKE_PROGRAM=ninja.exe -DQTROOT=%Qt6_DIR% -DMPV_INCLUDE_DIR=mpv/include -DMPV_LIBRARY=mpv/libmpv-2.dll ..
         lib /def:mpv\mpv.def /out:mpv\libmpv-2.dll.lib /MACHINE:X86
         ninja
         ninja windows_package
@@ -210,10 +220,12 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        tag: [oracular, noble, jammy]
+        tag: [plucky, oracular, noble, jammy]
     runs-on: "ubuntu-latest"
     steps:
     - uses: actions/checkout@v4
+      with:
+        submodules: recursive
     - name: Install dependencies
       run: |
         sudo apt-get update
@@ -285,6 +297,8 @@ jobs:
     runs-on: "ubuntu-latest"
     steps:
     - uses: actions/checkout@v4
+      with:
+        submodules: recursive
     - name: Install dependencies
       run: |
         sudo apt-get update
