@@ -8,7 +8,7 @@ import QtQuick.Controls 6.0
 Window
 {
   id: mainWindow
-  title: "Jellyfin Media Player"
+  title: "Jellyfin"
   objectName: "mainWindow"
   width: 1280
   height: 720
@@ -234,7 +234,7 @@ Window
     }
     profile.persistentCookiesPolicy: WebEngineProfile.AllowPersistentCookies
     profile.offTheRecord: false
-    profile.storageName: "JellyfinMediaPlayerStorage"
+    profile.storageName: "JellyfinDesktopStorage"
 
     Component.onCompleted:
     {
@@ -306,11 +306,11 @@ Window
       components.system.jsLog(level, sourceID + ":" + lineNumber + " " + message);
     }
 
-    onCertificateError:
+    onCertificateError: function(error)
     {
       console.log(error.url + " :" + error.description + error.error)
       if (components.settings.ignoreSSLErrors()) {
-        error.ignoreCertificateError()
+        error.acceptCertificate()
       }
     }
   }
