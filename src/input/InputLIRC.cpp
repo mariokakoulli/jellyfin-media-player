@@ -11,8 +11,7 @@ InputLIRC::InputLIRC(QObject* parent) : InputBase(parent)
   socket = new QLocalSocket(this);
   socketNotifier = NULL;
 
-  connect(socket, SIGNAL(error(QLocalSocket::LocalSocketError)), this,
-          SLOT(socketerror(QLocalSocket::LocalSocketError)));
+  connect(socket, &QLocalSocket::errorOccurred, this, &InputLIRC::socketerror);
   connect(socket, SIGNAL(connected()), this, SLOT(connected()));
   connect(socket, SIGNAL(disconnected()), this, SLOT(disconnected()));
 }
@@ -79,7 +78,10 @@ void InputLIRC::disconnected()
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 void InputLIRC::socketerror(QLocalSocket::LocalSocketError socketError)
 {
-  qCritical() << "LIRC Socket Error : " << socketError;
+  if (socketError == QLocalSocket::ServerNotFoundError)
+    qDebug() << "LIRC socket not found";
+  else
+    qCritical() << "LIRC Socket Error : " << socketError;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

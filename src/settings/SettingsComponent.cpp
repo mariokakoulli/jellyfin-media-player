@@ -217,48 +217,44 @@ static void writeJson(const QString& filename, const QJsonObject& data, bool pre
 /////////////////////////////////////////////////////////////////////////////////////////
 QVariant SettingsComponent::readPreinitValue(const QString& sectionID, const QString& key)
 {
-  QJsonObject json = loadJson(Paths::dataDir("jellyfinmediaplayer.conf"));
+  QString path = Paths::dataDir("jellyfin-desktop.conf");
+  if (path.isEmpty())
+    return QVariant();
+  QJsonObject json = loadJson(path);
   return json["sections"].toObject()[sectionID].toObject()[key].toVariant();
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////
 void SettingsComponent::load()
 {
-  loadConf(Paths::dataDir("jellyfinmediaplayer.conf"), false);
+  QString profileDir = Paths::dataDir();
+  if (profileDir.isEmpty())
+  {
+    qInfo() << "No active profile, skipping settings load (using defaults)";
+    return;
+  }
+
+  loadConf(Paths::dataDir("jellyfin-desktop.conf"), false);
   loadConf(Paths::dataDir("storage.json"), true);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 void SettingsComponent::loadConf(const QString& path, bool storage)
 {
-  bool migrateJmpSettings4 = false;
-  bool migrateJmpSettings5 = false;
-  bool migrateJmpSettings6 = false;
   QJsonObject json = loadJson(path);
 
   int version = json["version"].toInt(0);
 
-  if (version == 4 && m_settingsVersion == 6)
+  if (version != m_settingsVersion)
   {
-    migrateJmpSettings4 = true;
-  }
-  else if (version == 5 && m_settingsVersion == 6)
-  {
-    migrateJmpSettings5 = true;
-  }
-  else if (version == 6 && m_settingsVersion == 7)
-  {
-    migrateJmpSettings6 = true;
-  }
-  else if (version != m_settingsVersion)
-  {
-    QString backup = path + ".broken";
-    QFile::remove(backup);
-    QFile::rename(path, backup);
-    if (version == 0)
-      qCritical() << "Could not read config file.";
-    else
+    // version 0 means file doesn't exist or is empty - skip backup/warning
+    if (version != 0)
+    {
+      QString backup = path + ".broken";
+      QFile::remove(backup);
+      QFile::rename(path, backup);
       qCritical() << "Config version is" << version << "but" << m_settingsVersion << "expected. Moving old config to" << backup;
+    }
     // Overwrite/create it with the defaults.
     if (storage)
       saveStorage();
@@ -291,22 +287,6 @@ void SettingsComponent::loadConf(const QString& path, bool storage)
       sec->setValue(setting, jsonSection.value(setting).toVariant());
   }
 
-  if (migrateJmpSettings4) {
-    getSection(SETTINGS_SECTION_MAIN)->setValue("webMode", "desktop");
-    getSection(SETTINGS_SECTION_MAIN)->setValue("layout", "desktop");
-    if (getSection(SETTINGS_SECTION_VIDEO)->value("hardwareDecoding") == "disabled") {
-      getSection(SETTINGS_SECTION_VIDEO)->setValue("hardwareDecoding", "copy");
-    }
-  } else if (migrateJmpSettings5) {
-    if (getSection(SETTINGS_SECTION_VIDEO)->value("hardwareDecoding") == "enabled") {
-      getSection(SETTINGS_SECTION_VIDEO)->setValue("hardwareDecoding", "copy");
-    }
-  } else if (migrateJmpSettings6) {
-    if (getSection(SETTINGS_SECTION_MAIN)->value("autodetectCertBundle") == "false") {
-      getSection(SETTINGS_SECTION_MAIN)->setValue("autodetectCertBundle", "true");
-    }
-  }
-
 #ifdef DISABLE_UPDATE_CHECK
     getSection(SETTINGS_SECTION_MAIN)->setValueHidden("checkForUpdates", "true");
 #endif
@@ -315,6 +295,12 @@ void SettingsComponent::loadConf(const QString& path, bool storage)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 void SettingsComponent::saveSettings()
 {
+  QString path = Paths::dataDir("jellyfin-desktop.conf");
+  if (path.isEmpty())
+  {
+    qWarning() << "No active profile, cannot save settings";
+    return;
+  }
 
   QVariantMap sections;
 
@@ -327,12 +313,19 @@ void SettingsComponent::saveSettings()
   QJsonObject json;
   json.insert("sections", QJsonValue::fromVariant(sections));
   json.insert("version", m_settingsVersion);
-  writeJson(Paths::dataDir("jellyfinmediaplayer.conf"), json);
+  writeJson(path, json);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 void SettingsComponent::saveStorage()
 {
+  QString path = Paths::dataDir("storage.json");
+  if (path.isEmpty())
+  {
+    qWarning() << "No active profile, cannot save storage";
+    return;
+  }
+
   QVariantMap storage;
 
   for(SettingsSection* section : m_sections.values())
@@ -344,7 +337,7 @@ void SettingsComponent::saveStorage()
   QJsonObject storagejson;
   storagejson.insert("sections", QJsonValue::fromVariant(storage));
   storagejson.insert("version", m_settingsVersion);
-  writeJson(Paths::dataDir("storage.json"), storagejson, false);
+  writeJson(path, storagejson, false);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -723,8 +716,11 @@ bool SettingsComponent::componentInitialize()
 /////////////////////////////////////////////////////////////////////////////////////////
 bool SettingsComponent::resetAndSaveOldConfiguration()
 {
-  QFile settingsFile(Paths::dataDir("jellyfinmediaplayer.conf"));
-  return settingsFile.rename(Paths::dataDir("jellyfinmediaplayer.conf.old"));
+  QString path = Paths::dataDir("jellyfin-desktop.conf");
+  if (path.isEmpty())
+    return false;
+  QFile settingsFile(path);
+  return settingsFile.rename(Paths::dataDir("jellyfin-desktop.conf.old"));
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////
@@ -768,7 +764,7 @@ QString SettingsComponent::getClientName()
   QString name;
   name = SettingsComponent::Get().value(SETTINGS_SECTION_SYSTEM, "systemname").toString();
 
-  if (name.compare("JellyfinMediaPlayer") == 0) {
+  if (name.compare("JellyfinDesktop") == 0) {
     name = Utils::ComputerName();
   }
 
@@ -778,7 +774,7 @@ QString SettingsComponent::getClientName()
 /////////////////////////////////////////////////////////////////////////////////////////
 bool SettingsComponent::ignoreSSLErrors()
 {
-  return SettingsComponent::Get().value(SETTINGS_SECTION_MAIN, "ignoreSSLErrors").toBool();
+  return m_cliIgnoreSSLErrors || SettingsComponent::Get().value(SETTINGS_SECTION_MAIN, "ignoreSSLErrors").toBool();
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////
@@ -843,8 +839,8 @@ void SettingsComponent::setCommandLineValues(const QStringList& values)
       setValue(SETTINGS_SECTION_MAIN, "layout", "desktop");
     else if (value == "tv")
       setValue(SETTINGS_SECTION_MAIN, "layout", "tv");
-    else if (value == "force-external-webclient")
-      setValue(SETTINGS_SECTION_MAIN, "forceExternalWebclient", true);
+    else if (value == "ignore-certificate-errors")
+      m_cliIgnoreSSLErrors = true;
   }
 }
 

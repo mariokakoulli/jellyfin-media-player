@@ -1,29 +1,29 @@
-# Jellyfin Media Player
+# Jellyfin Desktop
 
 Desktop client using jellyfin-web with embedded MPV player. Supports Windows, Mac OS,
 and Linux. Media plays within the same window using the jellyfin-web interface unlike
 Jellyfin Desktop. Supports audio passthrough.
 
-![Screenshot of Jellyfin Media Player](https://raw.githubusercontent.com/iwalton3/mpv-shim-misc-docs/master/images/jmp-player-win.png)
+![Screenshot of Jellyfin Desktop](https://raw.githubusercontent.com/iwalton3/mpv-shim-misc-docs/master/images/jmp-player-win.png)
 
 Downloads:
- - [Windows, Mac, and Linux Releases](https://github.com/jellyfin/jellyfin-media-player/releases)
+ - [Windows, Mac, and Linux Releases](https://github.com/jellyfin/jellyfin-desktop/releases)
    - Note for Mac users: builds for Intel require macOS 12+ and Apple Silicon builds requires macOS 14+
- - [Flathub (Linux)](https://flathub.org/apps/details/com.github.iwalton3.jellyfin-media-player)
+ - [Flathub (Linux)](https://flathub.org/apps/details/org.jellyfin.JellyfinDesktop)
 
 Related Documents:
  - Web client: Application uses server-provided web client.
- - Web client integration documentation: [for-web-developers.md](https://github.com/jellyfin/jellyfin-media-player/blob/master/for-web-developers.md)
- - API Docs in [client-api.md](https://github.com/jellyfin/jellyfin-media-player/blob/master/client-api.md)
+ - Web client integration documentation: [for-web-developers.md](https://github.com/jellyfin/jellyfin-desktop/blob/master/for-web-developers.md)
+ - API Docs in [client-api.md](https://github.com/jellyfin/jellyfin-desktop/blob/master/client-api.md)
  - Tip: For help building, look at the GitHub Actions file!
 
 ## Building at a glance (Linux)
 
-To download the latest stable release, get the latest version tag from the [latest releases page](https://github.com/jellyfin/jellyfin-media-player/releases/latest) and append the following to your pull command during the build phase for JMP "--branch $VERSIONTAG --single-branch"
+To download the latest stable release, get the latest version tag from the [latest releases page](https://github.com/jellyfin/jellyfin-desktop/releases/latest) and append the following to your pull command during the build phase for JMP "--branch $VERSIONTAG --single-branch"
 
 Example:
 ```bash
-git clone --recursive https://github.com/jellyfin/jellyfin-media-player.git --branch v1.9.1 --single-branch
+git clone --recursive https://github.com/jellyfin/jellyfin-desktop.git --branch v1.9.1 --single-branch
 ```
 
 
@@ -31,7 +31,7 @@ git clone --recursive https://github.com/jellyfin/jellyfin-media-player.git --br
 
 Install dependencies:
 ```bash
-sudo apt install  autoconf automake build-essential cmake curl g++ git libasound2-dev libcec-dev libegl1-mesa-dev libfontconfig1-dev libfreetype6-dev libfribidi-dev libgl1-mesa-dev libgnutls28-dev libharfbuzz-dev libpulse-dev libsdl2-dev libtool libuchardet-dev libva-dev libvdpau-dev libx11-dev libxrandr-dev mesa-common-dev meson python3 qml6-module-qtqml-workerscript qml6-module-qtquick-controls qml6-module-qtquick-templates qml6-module-qtquick-window qml6-module-qtwebchannel qml6-module-qtwebengine qml6-module-qtwebengine-controlsdelegates qml6-module-qtwebview qt6-base-private-dev qt6-webengine-private-dev unzip wget yasm zlib1g-dev
+sudo apt install  autoconf automake build-essential cmake curl g++ git libasound2-dev libcec-dev libegl1-mesa-dev libfontconfig1-dev libfreetype6-dev libfribidi-dev libgl1-mesa-dev libgnutls28-dev libharfbuzz-dev libpulse-dev libsdl2-dev libtool libuchardet-dev libva-dev libvdpau-dev libx11-dev libxrandr-dev mesa-common-dev meson qml6-module-qtqml-workerscript qml6-module-qtquick-controls qml6-module-qtquick-templates qml6-module-qtquick-window qml6-module-qtwebchannel qml6-module-qtwebengine qml6-module-qtwebengine-controlsdelegates qml6-module-qtwebview qt6-base-private-dev qt6-webengine-private-dev unzip wget yasm zlib1g-dev
 mkdir ~/jmp; cd ~/jmp
 git clone https://github.com/mpv-player/mpv-build.git
 cd mpv-build
@@ -44,8 +44,8 @@ sudo ln -s /usr/local/lib/x86_64-linux-gnu/libmpv.so /usr/local/lib/x86_64-linux
 sudo ln -sf /usr/local/lib/x86_64-linux-gnu/libmpv.so /usr/local/lib/libmpv.so.2
 sudo ldconfig
 cd ~/jmp/
-git clone --recursive https://github.com/jellyfin/jellyfin-media-player.git
-cd jellyfin-media-player
+git clone --recursive https://github.com/jellyfin/jellyfin-desktop.git
+cd jellyfin-desktop
 mkdir build
 cd build
 cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=/usr/local/ -G Ninja ..
@@ -58,7 +58,7 @@ rm -rf ~/jmp/
 
 Install dependencies:
 ```bash
-sudo dnf install autoconf automake libtool freetype-devel libXrandr-devel libvdpau-devel libva-devel  mesa-libGL-devel libdrm-devel libX11-devel  mesa-libEGL-devel yasm  alsa-lib pulseaudio-libs-devel zlib-devel fribidi-devel git gnutls-devel mesa-libGLU-devel  SDL2-devel cmake wget python g++  qt-devel libcec-devel qt6-qtbase-devel curl unzip qt6-qtwebchannel-devel qt6-qtwebengine-devel mpv.x86_64 qt6-qtbase.x86_64 meson.noarch ninja-build.x86_64 qt6-qtbase-private-devel mpv-libs.x86_64 mpv-devel qt6-qtdeclarative nasm libatomic libshaderc-2024.3
+sudo dnf install autoconf automake libtool freetype-devel libXrandr-devel libvdpau-devel libva-devel  mesa-libGL-devel libdrm-devel libX11-devel  mesa-libEGL-devel yasm  alsa-lib pulseaudio-libs-devel zlib-devel fribidi-devel git gnutls-devel mesa-libGLU-devel  SDL2-devel cmake wget g++ qt-devel libcec-devel qt6-qtbase-devel curl unzip qt6-qtwebchannel-devel qt6-qtwebengine-devel mpv.x86_64 qt6-qtbase.x86_64 meson.noarch ninja-build.x86_64 qt6-qtbase-private-devel mpv-libs.x86_64 mpv-devel qt6-qtdeclarative nasm libatomic libshaderc mpvqt-devel
 ```
 
 Build commands for Fedora:
@@ -77,8 +77,8 @@ sudo ln -s /usr/local/lib64/libmpv.so /usr/local/lib/x86_64-linux-gnu/libmpv.so.
 sudo ln -s /usr/local/lib64/libmpv.so /usr/local/lib/x86_64-linux-gnu/libmpv.so
 sudo ldconfig
 cd ~/jmp/
-git clone --recursive https://github.com/jellyfin/jellyfin-media-player.git
-cd jellyfin-media-player/
+git clone --recursive https://github.com/jellyfin/jellyfin-desktop.git
+cd jellyfin-desktop/
 mkdir build
 cd build/
 cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=/usr/local/ ..
@@ -107,8 +107,8 @@ Please install:
 You need to run these commands in git bash.
 
 ```bash
-git clone --recursive https://github.com/jellyfin/jellyfin-media-player
-cd jellyfin-media-player
+git clone --recursive https://github.com/jellyfin/jellyfin-desktop
+cd jellyfin-desktop
 mkdir build
 cd build
 ```
@@ -130,37 +130,30 @@ Install [Qt 6](https://www.qt.io/download-thank-you?hsLang=en), remember to chec
 Then run the following commands (replace <QT_DIR> with your QT installation location):
 
 ```bash
-brew install mpv ninja
+brew install mpv ninja qt
 
-git clone --recursive https://github.com/jellyfin/jellyfin-media-player.git
-cd jellyfin-media-player
-mkdir build
-cd build
-cmake -GNinja -DQTROOT=<QT_DIR> -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=output ..
-ninja install
-```
+git clone --recursive https://github.com/jellyfin/jellyfin-desktop.git
+cd jellyfin-desktop
 
-To create redistributable bundle, some library paths need to be fixed. At the project root directory, run:
-
-```bash
-python3 ./scripts/fix-install-names.py ./build/output/Jellyfin\ Media\ Player.app
+cmake -B build -G Ninja -DUSE_STATIC_MPVQT=ON
+cmake --build build
 ```
 
 ## Log File Location
 
- - Windows: `%LOCALAPPDATA%\JellyfinMediaPlayer\logs`
- - Linux: `~/.local/share/jellyfinmediaplayer/logs/`
- - Linux (Flatpak): `~/.var/app/com.github.iwalton3.jellyfin-media-player/data/jellyfinmediaplayer/logs/`
- - macOS: `~/Library/Logs/Jellyfin Media Player/`
+ - Windows: `%LOCALAPPDATA%\Jellyfin Desktop\logs`
+ - Linux: `~/.local/share/jellyfin-desktop/logs/`
+ - Linux (Flatpak): `~/.var/app/org.jellyfin.JellyfinDesktop/data/jellyfin-desktop/logs/`
+ - macOS: `~/Library/Logs/Jellyfin Desktop/`
 
 ## Config File Location
 
-The main configuration file is called `jellyfinmediaplayer.conf`. You can also add a `mpv.conf` to configure MPV directly.
+The main configuration file is called `jellyfin-desktop.conf`. You can also add a `mpv.conf` to configure MPV directly.
 
- - Windows: `%LOCALAPPDATA%\JellyfinMediaPlayer\`
- - Linux: `~/.local/share/jellyfinmediaplayer/`
- - Linux (Flatpak): `~/.var/app/com.github.iwalton3.jellyfin-media-player/data/jellyfinmediaplayer/`
- - macOS: `~/Library/Application Support/Jellyfin Media Player/`
+ - Windows: `%LOCALAPPDATA%\Jellyfin Desktop\`
+ - Linux: `~/.local/share/jellyfin-desktop/`
+ - Linux (Flatpak): `~/.var/app/org.jellyfin.JellyfinDesktop/data/jellyfin-desktop/`
+ - macOS: `~/Library/Application Support/Jellyfin Desktop/`
 
 ## Web Debugger
 
@@ -179,7 +172,7 @@ If you have problems:
 
 ## License
 
-Jellyfin Media Player is licensed under GPL v2. See the ``LICENSE`` file.
+Jellyfin Desktop is licensed under GPL v2. See the ``LICENSE`` file.
 Licenses of dependencies are summarized under ``resources/misc/licenses.txt``.
 This file can also be printed at runtime when using the ``--licenses`` option.
 
